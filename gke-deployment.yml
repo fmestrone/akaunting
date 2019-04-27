@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: akaunting-deployment
+  labels:
+    app: akaunting
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: akaunting
+  template:
+    metadata:
+      labels:
+        app: akaunting
+    spec:
+      containers:
+      - name: akaunting
+        image: gcr.io/akaunting3/akaunting:v1
+        ports:
+        - containerPort: 8080
+          hostPort: 80
+        env:
+        - name: APP_DEBUG
+          value: "true"
+      - name: mysql
+        image: mysql:5
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: akaunting_root_password
+        - name: MYSQL_DATABASE
+          value: akaunting_db
+        - name: MYSQL_USER
+          value: akaunting_admin
+        - name: MYSQL_PASSWORD
+          value: akaunting_password
