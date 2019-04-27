@@ -63,11 +63,9 @@ class Companies extends Controller
     {
         $company_id = session('company_id');
 
-        setting()->forgetAll();
-
         // Create company
         $company = Company::create($request->input());
-
+        
         // Create settings
         setting()->set('general.company_name', $request->get('company_name'));
         setting()->set('general.company_email', $request->get('company_email'));
@@ -85,8 +83,6 @@ class Companies extends Controller
 
         setting()->set('general.default_currency', $request->get('default_currency'));
         setting()->set('general.default_locale', session('locale'));
-
-        setting()->setExtraColumns(['company_id' => $company->id]);
         setting()->save();
 
         setting()->forgetAll();
@@ -224,6 +220,8 @@ class Companies extends Controller
         if (!$this->isUserCompany($company)) {
             $message = trans('companies.error.not_user_company');
 
+            Overrider::load('settings');
+
             flash($message)->error();
 
             return redirect()->route('companies.index');
@@ -278,6 +276,8 @@ class Companies extends Controller
         // Check if user can manage company
         if ($this->isUserCompany($company)) {
             session(['company_id' => $company->id]);
+
+            Overrider::load('settings');
 
             event(new CompanySwitched($company));
         }
